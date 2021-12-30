@@ -9,7 +9,14 @@ Maybe consider reading at git hub for nices formatting?
 
 Five flaws from [OWASP 2017 top ten list](https://owasp.org/www-project-top-ten/) and how to fix them. The 2017 list is used but also 2021 name is mentioned in addition of 2017.
 
-Detailed installation instruction are omitted because Django framework is used as instructed in course and project description, but generally should install Django framework and then run python manage.py migrate and python manage.py runserver
+Detailed installation instruction are omitted because Django framework is used as instructed in course and project description, but generally should install Django framework and then run:
+```python
+python manage.py migrate
+```
+and
+```python
+python manage.py runserver
+```
 
 ### FLAW 1 - A01:2017-Injection / A03:2021-Injection
 1. Source: [views.py line 30](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L30)
