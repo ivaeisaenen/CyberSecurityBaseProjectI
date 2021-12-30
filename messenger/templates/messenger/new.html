@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<form action="/send" method="POST">
+    {% csrf_token %}
+    Message: <br>
+    <textarea name="content" rows="3" cols="60"></textarea>
+    <br>
+    <input type="submit" value="Send">
+</form>

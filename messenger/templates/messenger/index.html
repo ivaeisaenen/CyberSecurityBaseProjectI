@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    {% load static from static %}
+    <link rel="shortcut icon" href="{% static '/images/favicon.png' %}"/>
+    <head>
+        <title>Messenger</title>
+    </head>
+
+    <body>
+        <h4>Message count: {{count}}</h4>
+        <hr>
+        {% for message in message_list %}
+            Message: {{ message.content }}
+            <p>
+            Sender: {{ message.user.username }}
+            <p>
+            Time: {{ message.sent_at }}
+            <hr>
+        {% endfor %}
+
+        <h4>Show messages only from selected user:</h4>
+        <form action="/filter_messages_by_user" method="POST">
+            <select name="username" id="user_select">
+                {% for username in username_list %}
+                    <option value="{{ username }}">{{ username }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Select">
+        </form>
+        <hr>
+
+        {% if user.is_authenticated %}
+                <a href="/new">Send new message</a>
+            <div class="alert alert-success" role="alert">
+                <h3>Welcome {{ user.username }}!</h3>
+                <a href="{% url 'logout' %}">Logout?</a>
+            </div>
+        {% else %}
+            <div class="alert alert-success" role="alert">
+                <h3>Welcome!</h3>
+                <a href="{% url 'register' %}">Signup</a>
+                <a href="{% url 'login' %}">Login</a>
+            </div>
+        {% endif %}
+        <p>
+        {% if user.is_authenticated %}
+            User profile: <a href="{% url 'profile' %}">{{user.username}}</a>
+        {% endif %}
+    </body>

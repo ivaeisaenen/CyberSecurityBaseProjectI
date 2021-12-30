@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    {% load static from static %}
+    <link rel="shortcut icon" href="{% static '/images/favicon.png' %}"/>
+    <head>
+        <title>Profile</title>
+    </head>
+    <body>
+        Showing page for user_id: {{user.id}}
+        <p>
+        Username: {{ user.username }}
+        <p>
+        First Name: {{ user.first_name }}
+        <p>
+        Last Name: {{ user.last_name }}
+    </body>
