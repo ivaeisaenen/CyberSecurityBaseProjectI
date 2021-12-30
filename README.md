@@ -18,12 +18,16 @@ and
 python manage.py runserver
 ```
 
+## Preface
+
+Generally it seems really hard to do insecure design using Django framework but also might be really difficult to find out security flaws as so much is done by Django framework behind the scenes
+
 ### FLAW 1 - A01:2017-Injection / A03:2021-Injection
 1. Source: [views.py line 30](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L30)
 ```python
 user_filter_id = User.objects.raw(f"SELECT id, username FROM auth_user WHERE username='{str(filter_username)}' ORDER BY id")[0].id
 ```
-2. Description: SQL injection vulnerability. Any maliculous username can be used for injections. SQL injections are dangerous as this can lead data alterations including total data destruction and cleverly altered data. Extreme cases there can be added users with admin privilidges or other harmfull additions which can go totally unnoticed. Total data destruction is at leas usually noticed.
+2. Description: SQL injection vulnerability. Any malicious username can be used for injections. SQL injections are dangerous as this can lead data alterations including total data destruction and cleverly altered data. Extreme cases there can be added users with admin privileges or other harmful additions which can go totally unnoticed. Total data destruction is at leas usually noticed.
 3. How to fix: Change raw SQL handling to ORM by changing affected lines to:
 ```python
 user_filter_id = User.objects.filter(username=filter_username)[0].id
@@ -83,25 +87,27 @@ to
 ```python
 DEBUG = True
 ```
-2. Description: Debug mode is left on in setting.py
-3. How to fix: Change the affected line to:
+2. Description: Debug mode is left on in setting.py. Enabling debug mode greatly increases risk of sensitive data leakage as [Django debug](https://docs.djangoproject.com/en/dev/ref/settings/#debug) informations says "Never deploy a site into production with DEBUG turned on" even they promise they do their best to obscure secure information.
+3. How to fix: Change the affected line in setting.py file to following:
 ```python
 DEBUG = False
 ```
 
-### FLAW 4 A05:2017-Broken Access Control / A01:2021-Broken Acces Control
+### FLAW 4 A05:2017-Broken Access Control / A01:2021-Broken Access Control
 1. Source: [views.py line 62](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L62)
 2. Description: Access to user data is not done secure way but as GET parameter which can be altered by anybody to see any user profile:
 ```python
 current_user = User.objects.get(id=int(user_id.split()[0])).
 ```
-There is also ```python @csrf_exempt``` decorator for filter_messages_by_users function which should be removed and proper {% csrf_token %} introduced in the index.html for the given form.
-3. How to fix: Using request.user to get current user to show only current logged in user profile as instructed in FLAW 2 section. Generally authentication or confidental data inputs should not be handled using GET commans and authentication should be verified with CSRF token.
+There is also ```@csrf_exempt``` decorator for filter_messages_by_users function which should be removed and proper ```{% csrf_token %}``` introduced in the index.html for the given form.
+
+3. How to fix: Using request.user to get current user to show only current logged in user profile as instructed in FLAW 2 section. Generally authentication or confidential data inputs should not be handled using GET commands and authentication should be verified with CSRF token.
 
 ### FLAW 5 A03:2017-Sensitive Data Exposure / A02:2021-Cryptographic Failures or A04:2021-Insecure Design
 1. Source: [setting.py line 23](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/cyber3/settings.py#L23)
 2. Description: Sensitive data leakage as secret key is stored in github repository
-3. How to fix: Remove the line and replace with:
+3. How to fix:
+Remove the line and replace with:
 ```python
     with open('/etc/secret_key.txt') as f:
         SECRET_KEY = f.read().strip()
@@ -113,7 +119,7 @@ or
 ```
 Do not keep secret_key.txt in the github repository
 
-### FLAW 6
+### FLAW 6 A03:2017-Sensitive Data Exposure / A02:2021-Cryptographic Failures or A04:2021-Insecure Design
 1. Source: Everywhere
 2. Description: HTTPS not enabled
 3. How to fix: In production server enable in setting.py
@@ -160,24 +166,8 @@ Also views.py should be added:
 ```python
 import logging
 logger = logging.getLogger('owasp_logger')
-Then also log intresting events such as maybe succesful or/and failed user logins:
+```
+Then also log interesting events such as maybe successful or/and failed user logins:
+```python
     logger.debug(f"Some string telling something happened for username: {user.username}")
 ```
-
-## Notes for developer how to start and run a Django project
-
-[Writing your first Django app, part 1](https://docs.djangoproject.com/en/3.1/intro/tutorial01/)
-
-1. In project folder "django-admin startproject config" where config can be any folder name.
-
-2. In project folder "python manage.py startapp messenger" where messenger is any app name.
-
-3. In folder 'messenger' views.py def index(request) handles index page
-
-4. Create messenger/urls.py and other editing and definitely editing settings.py
-
-5. python manage.py migrate
-
-6. edit messenger/models.py models
-
-7. python manage.py makemigrations messenger
