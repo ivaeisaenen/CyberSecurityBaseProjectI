@@ -58,7 +58,9 @@ Change [index.html line 47]():
 User profile: <a href="profile/{{user.id}}">{{user.username}}</a>
 ```
 to
+```html
 User profile: <a href="profile">{{user.username}}</a>
+```
 
 Change [urls.py line 36]():
 ```python
@@ -82,9 +84,12 @@ DEBUG = False
 
 ### FLAW 4 A05:2017-Broken Access Control / A01:2021-Broken Acces Control
 1. Source: [views.py line 62](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L62)
-2. Description: Access to user data is not done secure way but as GET parameter which can be altered by anybody to see any user profile: current_user = User.objects.get(id=int(user_id.split()[0])).
-There is also @csrf_exempt decorator for filter_messages_by_users function which should be removed and proper {% csrf_token %} introduced in the index.html for the given form.
-3. How to fix: Using request.user to get current user to show only current logged in user profile as instructed in FLAW 2 section. Generally authentication or confidental data inputs should not be handled using GET commans and authentication should be verified with CSRF tokens and suchs.
+2. Description: Access to user data is not done secure way but as GET parameter which can be altered by anybody to see any user profile:
+```python
+current_user = User.objects.get(id=int(user_id.split()[0])).
+```
+There is also ```python @csrf_exempt``` decorator for filter_messages_by_users function which should be removed and proper {% csrf_token %} introduced in the index.html for the given form.
+3. How to fix: Using request.user to get current user to show only current logged in user profile as instructed in FLAW 2 section. Generally authentication or confidental data inputs should not be handled using GET commans and authentication should be verified with CSRF token.
 
 ### FLAW 5 A03:2017-Sensitive Data Exposure / A02:2021-Cryptographic Failures or A04:2021-Insecure Design
 1. Source: [setting.py line 23](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/cyber3/settings.py#L23)
