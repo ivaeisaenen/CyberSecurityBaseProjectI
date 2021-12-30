@@ -13,7 +13,9 @@ Detailed installation instruction are omitted because Django framework is used a
 
 ### FLAW 1 - A01:2017-Injection / A03:2021-Injection
 1. Source: [views.py line 30](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L30)
+```python
 user_filter_id = User.objects.raw(f"SELECT id, username FROM auth_user WHERE username='{str(filter_username)}' ORDER BY id")[0].id
+```
 2. Description: SQL injection vulnerability. Any maliculous username can be used for injections. SQL injections are dangerous as this can lead data alterations including total data destruction and cleverly altered data. Extreme cases there can be added users with admin privilidges or other harmfull additions which can go totally unnoticed. Total data destruction is at leas usually noticed.
 3. How to fix: Change raw SQL handling to ORM by changing affected lines to:
 ```python
@@ -59,16 +61,24 @@ to
 User profile: <a href="profile">{{user.username}}</a>
 
 Change [urls.py line 36]():
+```python
     path('profile/<str:user_id>', messenger_views.profile, name="profile"),
+```
 to
+```python
     path('profile/', messenger_views.profile, name="profile"),
+```
 
 ### FLAW 3 - A06:2016-Security Misconfiguration / A05:2021-Security Misconfiguration
 1. Source: [setting.py line 28](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/cyber3/settings.py#L28)
+```python
 DEBUG = True
+```
 2. Description: Debug mode is left on in setting.py
 3. How to fix: Change the affected line to:
+```python
 DEBUG = False
+```
 
 ### FLAW 4 A05:2017-Broken Access Control / A01:2021-Broken Acces Control
 1. Source: [views.py line 62](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/messenger/views.py#L62)
@@ -80,28 +90,33 @@ There is also @csrf_exempt decorator for filter_messages_by_users function which
 1. Source: [setting.py line 23](https://github.com/ivaeisaenen/CyberSecurityBaseProjectI/blob/c666851fafbe2b2c5d6c83741c580d01a0168212/cyber3/settings.py#L23)
 2. Description: Sensitive data leakage as secret key is stored in github repository
 3. How to fix: Remove the line and replace with:
+```python
     with open('/etc/secret_key.txt') as f:
         SECRET_KEY = f.read().strip()
+```
 or
+```python
     import os
     SECRET_KEY = os.environ['SECRET_KEY']
+```
 Do not keep secret_key.txt in the github repository
 
 ### FLAW 6
 1. Source: Everywhere
 2. Description: HTTPS not enabled
 3. How to fix: In production server enable in setting.py
+```python
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
+```
 
 ### FLAW 7 - A10:2017-Insufficient Logging&Monitoring
 1. Source: setting.py and views.py
 2. Description:
 3. How to fix: As the [Django documentation about logging](https://docs.djangoproject.com/en/4.0/topics/logging/) points out that there is need to add following to setting.py:
-
+```python
 import os
-
 LOGGING = {
     'formatters': {
         'verbose': {
@@ -127,13 +142,15 @@ LOGGING = {
         },
     },
 }
+```
 
 Also views.py should be added:
+```python
 import logging
 logger = logging.getLogger('owasp_logger')
 Then also log intresting events such as maybe succesful or/and failed user logins:
     logger.debug(f"Some string telling something happened for username: {user.username}")
-
+```
 
 ## Notes for developer how to start and run a Django project
 
